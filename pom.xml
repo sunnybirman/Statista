@@ -9,9 +9,7 @@
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>code-api-design</module>
-        <module>code-refactoring</module>
-        <module>code-error-handling</module>
+        <module>code-challenge</module>
     </modules>
 
 
