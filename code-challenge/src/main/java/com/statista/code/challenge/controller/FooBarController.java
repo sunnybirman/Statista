@@ -1,10 +1,11 @@
 package com.statista.code.challenge.controller;
-import java.util.List;
 import java.util.Set;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,19 +28,23 @@ public class FooBarController {
 
 	@Autowired
 	private BookingService bookingService;
+	@Autowired
+	private MessageSource messageSource;
 
 	// Create a new booking
 	@PostMapping("/booking")
-	public ResponseEntity<Long> createBooking(@RequestBody @Valid Booking bookingRequest) {
-		long id = bookingService.createBooking(bookingRequest);
-		return ResponseEntity.status(HttpStatus.CREATED).body(id);
+	public ResponseEntity<String> createBooking(@RequestBody @Valid Booking bookingRequest) {
+		bookingService.createBooking(bookingRequest);
+		String message = messageSource.getMessage("booking.confirmation.message", null, LocaleContextHolder.getLocale());
+		return ResponseEntity.status(HttpStatus.CREATED).body(message);
 	}
 
 	// Update an existing booking by booking ID
 	@PutMapping("/booking/{bookingId}")
-	public ResponseEntity<Long> updateBooking(@PathVariable long bookingId, @RequestBody @Valid Booking bookingRequest) {
-		long id = bookingService.updateBooking(bookingId, bookingRequest);
-		return ResponseEntity.status(HttpStatus.OK).body(id);
+	public ResponseEntity<String> updateBooking(@PathVariable long bookingId, @RequestBody @Valid Booking bookingRequest) {
+		bookingService.updateBooking(bookingId, bookingRequest);
+		String message = messageSource.getMessage("booking.update.message", null, LocaleContextHolder.getLocale());
+		return ResponseEntity.status(HttpStatus.OK).body(message);
 	}
 	
 
@@ -52,8 +57,8 @@ public class FooBarController {
 
 	// Retrieve bookings by department
 	@GetMapping("bookings/department/{department}")
-	public ResponseEntity<List<Booking>> getBookingByDepartment(@PathVariable DepartmentType department) {
-		List<Booking> bookings = bookingService.getBookingByDepartment(department);
+	public ResponseEntity<Set<Long>> getBookingByDepartment(@PathVariable DepartmentType department) {
+		Set<Long> bookings = bookingService.getBookingByDepartment(department);
 		return ResponseEntity.status(HttpStatus.OK).body(bookings);
 	}
 	
