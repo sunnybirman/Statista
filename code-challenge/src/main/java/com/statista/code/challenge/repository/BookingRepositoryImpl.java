@@ -91,17 +91,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 	    
 	    if(bookingIds==null)
 	    	 logger.info("Found nothing");
-		/*
-		 * List<Booking> bookings = new ArrayList<>();
-		 * 
-		 * if (bookingIds != null) { for (Long bookingId : bookingIds) { Booking booking
-		 * = bookingMap.get(bookingId); if (booking != null) { bookings.add(booking); }
-		 * else { logger.warn("Booking not found for ID: {}", bookingId); } } } else {
-		 * logger.warn("No bookings found for department: {}", department); }
-		 * 
-		 * logger.info("Found {} bookings for department: {}", bookings.size(),
-		 * department);
-		 */
+		
 	    return bookingIds;
 	}
 
@@ -141,6 +131,9 @@ public class BookingRepositoryImpl implements BookingRepository {
 
 	@Override
 	public void delete(Long bookingId) {
+		Booking booking = bookingMap.get(bookingId);
+		removeFromDepartmentIndex(nextBookingId, booking);
+		removeFromCurrencyMap(booking);
 		bookingMap.remove(bookingId);
 	}
 

@@ -5,13 +5,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
-public class EmailNotification implements Notification{
+public class EmailNotification implements NotificationService{
 
 	private static final Logger logger = LoggerFactory.getLogger(EmailNotification.class);
 	
+
+	
 	@Override
-	public void send() {
-		logger.info("Email notification sent");
+	public boolean sendNotification(String recipient, String message) {
+		logger.info("Email notification sent to {} with message {}", recipient, message);
+		return true;
+		
 	}
 
 }

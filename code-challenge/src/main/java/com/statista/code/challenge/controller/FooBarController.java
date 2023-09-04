@@ -4,8 +4,6 @@ import java.util.Set;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.statista.code.challenge.config.MessageConfig;
 import com.statista.code.challenge.model.Booking;
 import com.statista.code.challenge.model.DepartmentType;
 import com.statista.code.challenge.service.booking.BookingService;
@@ -29,13 +28,14 @@ public class FooBarController {
 	@Autowired
 	private BookingService bookingService;
 	@Autowired
-	private MessageSource messageSource;
+	private MessageConfig messageConfig;
 
 	// Create a new booking
 	@PostMapping("/booking")
 	public ResponseEntity<String> createBooking(@RequestBody @Valid Booking bookingRequest) {
-		bookingService.createBooking(bookingRequest);
-		String message = messageSource.getMessage("booking.confirmation.message", null, LocaleContextHolder.getLocale());
+		long id = bookingService.createBooking(bookingRequest);
+		//		String message = messageConfig.getBookingConfirmationMessage();
+		String message = String.format(messageConfig.getBookingConfirmationMessage(), id);
 		return ResponseEntity.status(HttpStatus.CREATED).body(message);
 	}
 
@@ -43,10 +43,10 @@ public class FooBarController {
 	@PutMapping("/booking/{bookingId}")
 	public ResponseEntity<String> updateBooking(@PathVariable long bookingId, @RequestBody @Valid Booking bookingRequest) {
 		bookingService.updateBooking(bookingId, bookingRequest);
-		String message = messageSource.getMessage("booking.update.message", null, LocaleContextHolder.getLocale());
+		String message = messageConfig.getBookingUpdateMessage();
 		return ResponseEntity.status(HttpStatus.OK).body(message);
 	}
-	
+
 
 	// Retrieve a booking by its ID
 	@GetMapping("/booking/{bookingId}")
@@ -61,21 +61,21 @@ public class FooBarController {
 		Set<Long> bookings = bookingService.getBookingByDepartment(department);
 		return ResponseEntity.status(HttpStatus.OK).body(bookings);
 	}
-	
+
 	// Retrieve a list of available currencies
 	@GetMapping("bookings/currencies")
 	public ResponseEntity<Set<String>> getCurrencies() {
 		Set<String> curriencies	= bookingService.getAllCurrencies();
 		return ResponseEntity.status(HttpStatus.OK).body(curriencies);
 	}
-	
+
 	// Calculate the total sum of bookings in a specific currency
 	@GetMapping("sum/{currency}")
 	public ResponseEntity<Double> getSumOfCurrency(@PathVariable String currency) {
 		Double sum = bookingService.getTotalPriceByCurrency(currency);
 		return ResponseEntity.status(HttpStatus.OK).body(sum);
 	}
-	
+
 	// Perform business operations for a specific booking
 	@GetMapping("bookings/dobusiness/{bookingId}")
 	public ResponseEntity<String> getBusiness(@PathVariable long bookingId) {

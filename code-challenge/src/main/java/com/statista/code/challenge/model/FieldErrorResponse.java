@@ -1,4 +1,4 @@
-package com.statista.code.challenge.exception;
+package com.statista.code.challenge.model;
 
 import java.util.Map;
 

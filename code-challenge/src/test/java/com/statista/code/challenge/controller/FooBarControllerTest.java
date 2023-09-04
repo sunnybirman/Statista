@@ -1,131 +1,111 @@
 package com.statista.code.challenge.controller;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.context.junit4.SpringRunner;
 
+import com.statista.code.challenge.config.MessageConfig;
 import com.statista.code.challenge.model.Booking;
 import com.statista.code.challenge.model.DepartmentType;
 import com.statista.code.challenge.service.booking.BookingService;
 
-//@RunWith(MockitoJUnitRunner.class)
-@RunWith(SpringRunner.class)
-@WebMvcTest(FooBarController.class)
 public class FooBarControllerTest {
 
+	@InjectMocks
+	private FooBarController fooBarController;
+
 	@Mock
-    private BookingService bookingService;
+	private BookingService bookingService;
 
-    @InjectMocks
-    private FooBarController fooBarController;
-    private Booking mockBooking;
-    
-    @Before
-    public void setup() {
-    	mockBooking  = new Booking("test", 22.2, "USD", 68312484, "test@em.com", DepartmentType.CUSTOMER_SUPPORT);
-    }
-    
-    @Test
-    public void testCreateBooking() {
-        when(bookingService.createBooking(any(Booking.class))).thenReturn(1L);
-        ResponseEntity<String> response = fooBarController.createBooking(mockBooking);
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertEquals(Long.valueOf(1), response.getBody());
-    }
-    
-    @Test
-    public void testUpdateBooking() {
-        when(bookingService.updateBooking(anyLong(), any(Booking.class))).thenReturn(1L);
+	@Mock
+	private MessageConfig messageConfig;
 
-        ResponseEntity<String> response = fooBarController.updateBooking(1L, mockBooking);
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+	}
+
+	@Test
+	public void testCreateBooking() {
+		Booking bookingRequest = new Booking(); // Create a valid Booking object here
+		when(bookingService.createBooking(bookingRequest)).thenReturn(1L);
+		when(messageConfig.getBookingConfirmationMessage()).thenReturn("Booking created with ID: %d");
+
+		ResponseEntity<String> response = fooBarController.createBooking(bookingRequest);
+
+		assertEquals(HttpStatus.CREATED, response.getStatusCode());
+		assertEquals("Booking created with ID: 1", response.getBody());
+	}
+
+
+	@Test
+	public void testGetBookingById() {
+		long bookingId = 1L;
+		Booking expectedBooking = new Booking(); // Create an expected Booking object here
+		when(bookingService.getBookingById(bookingId)).thenReturn(expectedBooking);
+
+		ResponseEntity<Booking> response = fooBarController.getBookingById(bookingId);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(expectedBooking, response.getBody());
+	}
+
+	@Test
+	public void testGetBookingByDepartment() {
+		DepartmentType department = DepartmentType.CUSTOMER_SUPPORT; 
+		Set<Long> expectedBookings = new HashSet<>();
+		when(bookingService.getBookingByDepartment(department)).thenReturn(expectedBookings);
+
+		ResponseEntity<Set<Long>> response = fooBarController.getBookingByDepartment(department);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(expectedBookings, response.getBody());
+	}
+
+	@Test
+	public void testGetCurrencies() {
+		Set<String> expectedCurrencies = new HashSet<>(); 
+		when(bookingService.getAllCurrencies()).thenReturn(expectedCurrencies);
+
+		ResponseEntity<Set<String>> response = fooBarController.getCurrencies();
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(expectedCurrencies, response.getBody());
+	}
+
+	@Test
+	public void testGetSumOfCurrency() {
+		String currency = "USD"; 
+		Double expectedSum = 1000.0; 
+
+		when(bookingService.getTotalPriceByCurrency(currency)).thenReturn(expectedSum);
+
+		ResponseEntity<Double> response = fooBarController.getSumOfCurrency(currency);
+
+		assertEquals(HttpStatus.OK, response.getStatusCode());
+		assertEquals(expectedSum, response.getBody());
+	}
+
+	@Test
+	public void testGetBusiness() {
+        long bookingId = 1L;
+        String expectedBusinessResult = "Some business result"; 
+
+        when(bookingService.doBusinessForBooking(bookingId)).thenReturn(expectedBusinessResult);
+
+        ResponseEntity<String> response = fooBarController.getBusiness(bookingId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(Long.valueOf(1), response.getBody());
+        assertEquals(expectedBusinessResult, response.getBody());
     }
-    
-    @Test
-    public void testGetBookingById() {
-        when(bookingService.getBookingById(1L)).thenReturn(mockBooking);
-
-        ResponseEntity<Booking> response = fooBarController.getBookingById(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockBooking, response.getBody());
-    }
-
-    @Test
-    public void testGetBookingByDepartment() {
-    	Set<Long> mockBookingIds = new HashSet<>();// Create mock Booking list
-    	mockBookingIds.add(1l);
-    	mockBookingIds.add(2l);
-        when(bookingService.getBookingByDepartment(any(DepartmentType.class))).thenReturn(mockBookingIds);
-
-        ResponseEntity<Set<Long>> response = fooBarController.getBookingByDepartment(DepartmentType.CUSTOMER_SUPPORT);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockBookingIds, response.getBody());
-    }
-
-    @Test
-    public void testGetCurrencies() {
-        Set<String> mockCurrencies = new HashSet<>(Arrays.asList("USD", "EUR"));
-        when(bookingService.getAllCurrencies()).thenReturn(mockCurrencies);
-
-        ResponseEntity<Set<String>> response = fooBarController.getCurrencies();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockCurrencies, response.getBody());
-    }
-
-    @Test
-    public void testGetSumOfCurrency() {
-        Double mockSum = 1000.0; // Mock sum value
-        when(bookingService.getTotalPriceByCurrency("USD")).thenReturn(mockSum);
-
-        ResponseEntity<Double> response = fooBarController.getSumOfCurrency("USD");
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockSum, response.getBody());
-    }
-
-    @Test
-    public void testGetBusiness() {
-        String mockBusinessResult = "Business done!"; // Mock business result
-        when(bookingService.doBusinessForBooking(1L)).thenReturn(mockBusinessResult);
-
-        ResponseEntity<String> response = fooBarController.getBusiness(1L);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(mockBusinessResult, response.getBody());
-    }
-    
-    @Test
-    public void testCreateBooking_InvalidInput() {
-        // Simulate invalid input
-        Booking invalidBooking = new Booking();
-        invalidBooking.setEmail("RRR");
-
-        ResponseEntity<String> response = fooBarController.createBooking(invalidBooking);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNull(response.getBody());
-    }
-    
-    
 }

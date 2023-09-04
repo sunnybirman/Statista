@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.statista.code.challenge.config.MessageConfig;
 import com.statista.code.challenge.model.Booking;
 import com.statista.code.challenge.model.DepartmentType;
 import com.statista.code.challenge.repository.BookingRepository;
 import com.statista.code.challenge.service.department.Department;
-import com.statista.code.challenge.service.notification.EmailNotification;
 import com.statista.code.challenge.service.notification.NotificationService;
 
 @Service
@@ -25,37 +25,48 @@ public class BookingServiceImpl implements BookingService {
 
 	private static final Logger logger = LoggerFactory.getLogger(BookingServiceImpl.class);
 
+	private MessageConfig messageConfig;
+
 	private final Map<DepartmentType, Department> departmentMap;
 
 	private BookingRepository bookingManagment;
-
-	private EmailNotification emailNotification;
 
 	private NotificationService notificationService;
 
 	@Autowired
 	public BookingServiceImpl(List<Department> businessLogics, BookingRepository bookingManagment,
-			EmailNotification emailNotification, NotificationService notificationService) {
+			NotificationService notificationService, MessageConfig messageConfig) {
 		this.departmentMap = businessLogics.stream()
 				.collect(Collectors.toMap(Department::getDepartment, Function.identity()));
 		this.bookingManagment = bookingManagment;
-		this.emailNotification = emailNotification;
 		this.notificationService = notificationService;
+		this.messageConfig = messageConfig;
 	}
 
 	public long createBooking(Booking booking) {
 		logger.info("Creating booking: {}", booking);
 		long bookingId = bookingManagment.save(booking);
 		logger.info("Booking created with ID: {}", bookingId);
-		notificationService.sendNotification(emailNotification);
+		String message = null;
+		if(bookingId != 0)
+			message = String.format(messageConfig.getEmailNotificationSucess(), booking);
+		else
+			message = messageConfig.getEmailNotificationFailure();
+
+		boolean isEmailSent = notificationService.sendNotification(booking.getEmail(), message);
+		if(!isEmailSent)
+			logger.error("Email service encountered issue for booking -  {}", bookingId);
 		return bookingId;
 	}
-	
+
 	public long createBooking(long bookingId, Booking booking) {
 		logger.info("Creating booking: {}", booking);
 		bookingManagment.save(bookingId, booking);
 		logger.info("Booking created with ID: {}", bookingId);
-		notificationService.sendNotification(emailNotification);
+		String message = String.format(messageConfig.getEmailNotificationSucess(), booking);
+		boolean isEmailSent = notificationService.sendNotification(booking.getEmail(), message);
+		if(!isEmailSent)
+			logger.error("Email service encountered issue for booking -  {}", bookingId);
 		return bookingId;
 	}
 
@@ -68,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
 			logger.info("Booking updated: {}", booking);
 		} else {
 			logger.error("Booking not found with ID: {}, creating new Booking", bookingId);
-			createBooking(booking);
+			createBooking(bookingId,booking);
 		}
 		return bookingId;
 	}
@@ -110,6 +121,4 @@ public class BookingServiceImpl implements BookingService {
 		Department department = departmentMap.get(booking.getDepartment());
 		return department.doBusiness();
 	}
-
-
 }

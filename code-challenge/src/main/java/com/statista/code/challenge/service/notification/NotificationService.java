@@ -1,13 +1,6 @@
 package com.statista.code.challenge.service.notification;
 
-import org.springframework.stereotype.Service;
+public interface NotificationService {
 
-@Service
-public class NotificationService {
-	
-	
-	public void sendNotification(Notification notification) {
-		notification.send();
-	}
-
+	 boolean sendNotification(String recipient, String message);
 }

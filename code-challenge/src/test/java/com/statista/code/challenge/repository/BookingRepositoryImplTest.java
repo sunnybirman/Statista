@@ -1,6 +1,6 @@
 package com.statista.code.challenge.repository;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,8 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -24,7 +24,7 @@ public class BookingRepositoryImplTest {
     @Mock
     private BookingRepositoryImpl bookingRepository;
 
-    @BeforeEach
+    @Before
     public void setUp() {
         MockitoAnnotations.initMocks(this);
     }
@@ -54,9 +54,8 @@ public class BookingRepositoryImplTest {
     @Test
     public void testFindBookingByDepartment() {
         Set<Long> expectedBookings = new HashSet<>();
-        expectedBookings.add(2l);
-        expectedBookings.add(1l);
-        
+        expectedBookings.add(2L);
+        expectedBookings.add(1L);
 
         when(bookingRepository.findBookingByDepartment(DepartmentType.CONTENT_DESIGN))
             .thenReturn(expectedBookings);
@@ -89,7 +88,7 @@ public class BookingRepositoryImplTest {
         bookingRepository.update(1L, updatedBooking);
 
         verify(bookingRepository, times(1)).update(bookingIdCaptor.capture(), bookingCaptor.capture());
-        assertEquals(1L, bookingIdCaptor.getValue());
+        assertEquals(1L, bookingIdCaptor.getValue().longValue());
         assertEquals(updatedBooking, bookingCaptor.getValue());
     }
 
@@ -99,6 +98,4 @@ public class BookingRepositoryImplTest {
 
         verify(bookingRepository, times(1)).delete(1L);
     }
-
-   
 }
