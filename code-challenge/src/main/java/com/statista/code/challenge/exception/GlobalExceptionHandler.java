@@ -94,4 +94,16 @@ public class GlobalExceptionHandler {
         errorResponse.setTimestamp(Instant.now());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 	}
+	
+	@ExceptionHandler({Exception.class, RuntimeException.class})
+    public ResponseEntity<ErrorResponse> handleGlobalException(Exception ex) {
+        logger.error("Unhandled exception occurred", ex);
+        
+        ErrorResponse errorResponse = new ErrorResponse();
+		errorResponse.setContact(messagesConfig.getContact());
+		errorResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        errorResponse.setMessage(messagesConfig.getGenericErrorMessage());
+        errorResponse.setTimestamp(Instant.now());
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
 }

@@ -43,4 +43,8 @@ public class MessageConfig {
 	public String getEmailNotificationFailure() {
 		return messageSource.getMessage("notification.email.failure", null, LocaleContextHolder.getLocale());
 	}
+	
+	public String getGenericErrorMessage() {
+		return messageSource.getMessage("error.generic.message", null, LocaleContextHolder.getLocale());
+	}
 }
