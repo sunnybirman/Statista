@@ -11,21 +11,21 @@ import springfox.documentation.spring.web.plugins.Docket;
 
 @Configuration
 public class SwaggerConfig {
-	 @Bean
-	    public Docket api() {
-	        return new Docket(DocumentationType.OAS_30)
-	            .select()
-	            .apis(RequestHandlerSelectors.basePackage("com.statista.code.challenge.controller"))
-	            .paths(PathSelectors.any())
-	            .build()
-	            .apiInfo(apiInfo());
-	    }
+	@Bean
+	public Docket api() {
+		return new Docket(DocumentationType.OAS_30)
+				.select()
+				.apis(RequestHandlerSelectors.basePackage("com.statista.code.challenge.controller"))
+				.paths(PathSelectors.any())
+				.build()
+				.apiInfo(apiInfo());
+	}
 
-	    private ApiInfo apiInfo() {
-	        return new ApiInfoBuilder()
-	            .title("Statista API")
-	            .description("Booking API")
-	            .version("1.0.0")
-	            .build();
-	    }
+	private ApiInfo apiInfo() {
+		return new ApiInfoBuilder()
+				.title("Statista API")
+				.description("Booking API")
+				.version("1.0.0")
+				.build();
+	}
 }
