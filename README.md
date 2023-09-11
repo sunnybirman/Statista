@@ -1,4 +1,6 @@
 **Approach**
+This is my approach to the problem
+
 **Repository layer**
 - Used Hashmap to store Booking Details in memory
 - For quick lookup through Department, used another Hasmap to work as index.
