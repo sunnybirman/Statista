@@ -11,7 +11,7 @@ This is my approach to the problem
 - Notification service is also loosely coupled with Service Implementation
 - Mocked the email notification behavior, just by looging. In the production that should be handled by a decoupled Kafka application
 
-  **Controller**
+**Controller**
   - Used swagger to document API for easy adoption
   - Business logic is separate from API documentation
   
