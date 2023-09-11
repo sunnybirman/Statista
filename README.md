@@ -1,3 +1,24 @@
+**Approach**
+**Repository layer**
+- Used Hashmap to store Booking Details in memory
+- For quick lookup through Department, used another Hasmap to work as index.
+- Repository implementation is loosely coupled, in future we can change behavior just by adding another implementation
+
+**Service Layer**
+- Service implementation is loosely coupled, in future we can change behavior just by adding another implementation
+- Notification service is also loosely coupled with Service Implementation
+- Mocked the email notification behavior, just by looging. In the production that should be handled by a decoupled Kafka application
+
+  **Controller**
+  - Used swagger to document API for easy adoption
+  - Business logic is separate from API documentation
+  
+
+**Testing**
+- Added Junit for Controller, Service, Repository implementation
+- Code coverage is more than 70%
+
+**Task**
 **Prerequisites**
 
 - JDK 8
