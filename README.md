@@ -17,7 +17,8 @@ This is my approach to the problem
 
 **Controller**
   - Used swagger to document API for easy adoption
-  - Business logic is separate from API documentation
+  - Decoupled API documentation from business logic by using the interface
+  - Maintaining API version for backward compatibility and future updates
 
 **Input validation**
 - Used Springs validation for request input validation
