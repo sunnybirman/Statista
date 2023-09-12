@@ -1,3 +1,40 @@
+**Approach**
+This is my approach to the problem
+
+**Database**
+- Used Hashmap to store Booking Details in memory
+- For quick lookup through the Department, used another Hasmap to work as an in memory index.
+
+**Repository layer**
+- Repository implementation is loosely coupled, in future we can change behavior just by adding another implementation
+- Since we are not using JPA/Databases, implemented transaction management manually
+- Handled multiple thread race conditions through the use of synchronized methods
+
+**Service Layer**
+- Service implementation is loosely coupled, in future we can change behavior just by adding another implementation
+- Notification service is also loosely coupled with Service Implementation
+- Mocked the email notification behavior, by logging. In production that should be handled by a decoupled Kafka application
+
+**Controller**
+  - Used swagger to document API for easy adoption
+  - Decoupled API documentation from business logic by using the interface
+  - Maintaining API version for backward compatibility and future updates
+
+**Input validation**
+- Used Springs validation for request input validation
+
+**Exception Handling**
+- Added global exception handler to handle exceptions and return respective Response back to the user
+
+**Testing**
+- Added Junit for Controller, Service, Repository implementation
+- Code coverage is more than 70%
+
+**Logging**
+- Used SLF4J for logging
+
+**Task**
+
 **Prerequisites**
 
 - JDK 8
