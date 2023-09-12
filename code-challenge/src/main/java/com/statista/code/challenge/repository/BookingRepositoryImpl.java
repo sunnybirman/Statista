@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -20,7 +21,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 
 	private static final Logger logger = LoggerFactory.getLogger(BookingRepositoryImpl.class);
 
-	private Long nextBookingId = 1L;
+	private AtomicLong atomicLong = new AtomicLong(1L);
 
 	// Hashmap to store booking objects
 	private Map<Long, Booking> bookingMap = new ConcurrentHashMap<>();
@@ -34,8 +35,8 @@ public class BookingRepositoryImpl implements BookingRepository {
 	@Override
 	public synchronized long save(Booking booking) {
 
+		Long nextBookingId = atomicLong.incrementAndGet();
 		try {
-			nextBookingId+=1;
 			// Begin custom transaction
 
 			// Perform the operations within the transaction
@@ -49,9 +50,9 @@ public class BookingRepositoryImpl implements BookingRepository {
 			// Handle exception,perform rollback actions if needed
 			logger.error("Error while saving booking", e);
 			bookingMap.remove(nextBookingId);
-			nextBookingId-=1;
 			removeFromDepartmentIndex(nextBookingId, booking);
 			removeFromCurrencyMap(booking);
+			nextBookingId = atomicLong.decrementAndGet();
 			throw new RuntimeException("Error while saving booking", e);
 		}
 	}
@@ -64,15 +65,15 @@ public class BookingRepositoryImpl implements BookingRepository {
 			// Begin custom transaction
 			// Perform the operations within the transaction
 			bookingMap.put(bookingId, booking);
-			addToDepartmentIndex(nextBookingId, booking);
+			addToDepartmentIndex(bookingId, booking);
 			addToCurrencyMap(booking);
-			logger.info("Booking saved with ID: {}", nextBookingId);
+			logger.info("Booking saved with ID: {}", bookingId);
 
 		} catch (Exception e) {
 			// Handle exception,perform rollback actions if needed
 			logger.error("Error while saving booking", e);
-			bookingMap.remove(nextBookingId);
-			removeFromDepartmentIndex(nextBookingId, booking);
+			bookingMap.remove(bookingId);
+			removeFromDepartmentIndex(bookingId, booking);
 			removeFromCurrencyMap(booking);
 			throw new RuntimeException("Error while saving booking", e);
 		}
@@ -132,7 +133,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 	@Override
 	public void delete(Long bookingId) {
 		Booking booking = bookingMap.get(bookingId);
-		removeFromDepartmentIndex(nextBookingId, booking);
+		removeFromDepartmentIndex(bookingId, booking);
 		removeFromCurrencyMap(booking);
 		bookingMap.remove(bookingId);
 	}

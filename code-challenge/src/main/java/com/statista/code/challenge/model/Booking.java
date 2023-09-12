@@ -5,6 +5,8 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class Booking {
 
 	@NotBlank (message = "Please provide description")
@@ -17,6 +19,7 @@ public class Booking {
     private String currency;
 	
 	@Min(0)
+	@JsonProperty("subscription_start_date")
     private long subscriptionStartDate;
     
 	@Email(message = "Please provide correct email")

@@ -2,7 +2,7 @@ package com.statista.code.challenge.model;
 
 public enum DepartmentType {
 	MARKET_INSIGHTS("MarketInsights"),
-	CONTENT_DESIGN("ContectDesign"),
+	CONTENT_DESIGN("ContentDesign"),
 	CUSTOMER_SUPPORT("CustomerSupport"),
 	TRAINING_AND_EDUCATION("Training&Education");
 
